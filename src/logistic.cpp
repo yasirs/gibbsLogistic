@@ -9,7 +9,6 @@
 
 
 
-using namespace arma;
 using namespace cppbugs;
 using std::cout;
 using std::endl;
@@ -49,9 +48,9 @@ RcppExport SEXP logistic(SEXP x_, SEXP y_) {
 
   const int NR = X.n_rows;
   const int NC = X.n_cols;
-  const arma::mat real_b = mat("0.1; 1.0");
+  const arma::mat real_b = arma::mat("0.1; 1.0");
 
-  TestModel m(y,X, randn<vec>(NC));
+  TestModel m(y,X, arma::randn<arma::vec>(NC));
   m.p_hat.setSaveHistory(false);
   int iterations = 1e5;
   m.sample(iterations, 1e4, 1e4, 10);
