@@ -42,18 +42,19 @@ public:
   }
 };
 
-RcppExport SEXP logistic(SEXP x_, SEXP y_, SEXP iterations_, SEXP burnin_, SEXP adapt_, SEXP thin_) {
+RcppExport SEXP logistic(SEXP x_, SEXP y_, SEXP iterations_, SEXP burnin_, SEXP adapt_, SEXP thin_, SEXP b_start_) {
   arma::mat X = Rcpp::as<arma::mat>(x_);
   arma::ivec y = Rcpp::as<arma::ivec>(y_);
   const int iterations = Rcpp::as<int>(iterations_);
   const int burnin = Rcpp::as<int>(burnin_);
   const int adapt = Rcpp::as<int>(adapt_);
   const int thin = Rcpp::as<int>(thin_);
+  const arma::vec b_start = Rcpp::as<arma::vec>(b_start_);
 
   const int NR = X.n_rows;
   const int NC = X.n_cols;
 
-  TestModel m(y,X, arma::randn<arma::vec>(NC));
+  TestModel m(y,X, b_start);
   m.p_hat.setSaveHistory(false);
   m.sample(iterations, burnin, adapt, thin);
   Rcpp::List ans;
