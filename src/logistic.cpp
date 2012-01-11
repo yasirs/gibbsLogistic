@@ -60,26 +60,20 @@ RcppExport SEXP logistic(SEXP x_, SEXP y_, SEXP iterations_, SEXP burnin_, SEXP 
   Rcpp::List ans;
   ans["b mean"] = m.b.mean();
   ans["mean likelihood"] = m.likelihood.meanLogLikelihood();
-  return Rcpp::wrap(ans);
-  /*
+
   typename std::list<double>::iterator max_logp_it = std::max_element(m.likelihood.logp_history.begin(), m.likelihood.logp_history.end());
   typename std::list<double>::iterator min_logp_it = std::min_element(m.likelihood.logp_history.begin(), m.likelihood.logp_history.end());
   typename std::list<vec>::iterator max_b_it = m.b.history.begin(); std::advance(max_b_it, std::distance(m.likelihood.logp_history.begin(),max_logp_it));
   typename std::list<vec>::iterator min_b_it = m.b.history.begin(); std::advance(min_b_it, std::distance(m.likelihood.logp_history.begin(),min_logp_it));
-  cout << "data generated from b:" << endl << real_b;
-  cout << "highest log likelihood attained in sampling:" << *max_logp_it << endl;
-  cout << "highest likelihood sampled b:"<<endl<< *max_b_it;
-  cout << "lowest log likelihood attained in sampling:" << *min_logp_it << endl;
-  cout << "lowest likelihood sampled b:"<<endl<< *min_b_it;
+  ans["best logP"]= *max_logp_it;
+  ans["best b"]= *max_b_it;
+  ans["worst logP"]= *min_logp_it;
+  ans["worst b"]= *min_b_it;
 
-
-  cout << "mean model likelihood:" << m.likelihood.meanLogLikelihood() << endl;
-  cout << "b: " << endl << m.b.mean();
-  cout << "R^2: " << m.rsq.mean() << endl;
-  cout << "samples: " << m.b.history.size() << endl;
-  cout << "acceptance_ratio: " << m.acceptance_ratio() << endl;
-  return 0;
-  */
+  ans["R^2"]= m.rsq.mean();
+  ans["samples"]= m.b.history.size();
+  ans["acceptance ratio"]= m.acceptance_ratio();
+  return Rcpp::wrap(ans);
 };
 
 
