@@ -42,18 +42,20 @@ public:
   }
 };
 
-RcppExport SEXP logistic(SEXP x_, SEXP y_) {
+RcppExport SEXP logistic(SEXP x_, SEXP y_, SEXP iterations_, SEXP burnin_, SEXP adapt_, SEXP thin_) {
   arma::mat X = Rcpp::as<arma::mat>(x_);
   arma::ivec y = Rcpp::as<arma::ivec>(y_);
+  const int iterations = Rcpp::as<int>(iterations_);
+  const int burnin = Rcpp::as<int>(burnin_);
+  const int adapt = Rcpp::as<int>(adapt_);
+  const int thin = Rcpp::as<int>(thin_);
 
   const int NR = X.n_rows;
   const int NC = X.n_cols;
-  const arma::mat real_b = arma::mat("0.1; 1.0");
 
   TestModel m(y,X, arma::randn<arma::vec>(NC));
   m.p_hat.setSaveHistory(false);
-  int iterations = 1e5;
-  m.sample(iterations, 1e4, 1e4, 10);
+  m.sample(iterations, burnin, adapt, thin);
   Rcpp::List ans;
   ans["b mean"] = m.b.mean();
   ans["mean likelihood"] = m.likelihood.meanLogLikelihood();
