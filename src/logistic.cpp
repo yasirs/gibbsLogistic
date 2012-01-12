@@ -18,7 +18,7 @@ public:
   const arma::ivec& y; // given
   const arma::mat& X; // given
 
-  Normal<arma::vec> b;
+  Uniform<arma::vec> b;
   Deterministic<arma::vec> p_hat;
   Bernoulli<arma::ivec> likelihood;
   Deterministic<double> rsq;
@@ -36,8 +36,8 @@ public:
 
   void update() {
     p_hat.value = 1/(1+exp(-X*b.value));
-    rsq.value = arma::as_scalar(1 - var(y - p_hat.value) / var(y));
-    b.dnorm(0.0, 0.0001);
+    rsq.value = arma::as_scalar(1 - var(y - p_hat.value) / var(arma::conv_to<arma::vec>::from(y)));
+    b.dunif(-5,5);
     likelihood.dbern(p_hat.value);
   }
 };
@@ -56,7 +56,11 @@ RcppExport SEXP logistic(SEXP x_, SEXP y_, SEXP iterations_, SEXP burnin_, SEXP 
 
   TestModel m(y,X, b_start);
   m.p_hat.setSaveHistory(false);
-  m.sample(iterations, burnin, adapt, thin);
+  if (adapt>0) {
+    m.tune(adapt, std::max(1,adapt/100));
+  }
+  m.b.value = b_start;
+  m.sample(iterations, burnin, 0, thin);
   Rcpp::List ans;
   ans["b mean"] = m.b.mean();
   ans["mean likelihood"] = m.likelihood.meanLogLikelihood();
